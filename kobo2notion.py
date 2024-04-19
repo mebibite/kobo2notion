@@ -14,6 +14,7 @@ import yaml
 # Define constants
 NODELTA_DATE = '1970-01-01 00:00:00'
 PAGES_URL = 'https://api.notion.com/v1/pages'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 # Define custom colors
 class ColorFormatter(logging.Formatter):
@@ -90,10 +91,13 @@ def convert_date(date_str):
     """Converts date string to a standardized format."""
     try:
         date_obj = datetime.fromisoformat(date_str)
-        standardized_date = date_obj.strftime('%Y-%m-%d %H:%M:%S')
-        return standardized_date
     except ValueError:
-        raise ValueError('Invalid date format')
+        try:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ')
+        except ValueError:
+            raise ValueError('Invalid date format')
+    standardized_date = date_obj.strftime('%Y-%m-%d %H:%M:%S')
+    return standardized_date
 
 
 def create_notion_page(parent_page_id, title_content, main_content, source_content):
@@ -190,15 +194,15 @@ def export_kobo_items(database_cache, delta_date):
 
     if latest_date:
         config['kobo2notion']['delta_date'] = latest_date
-        with open('config.yaml', 'w') as config_file:
+        with open(os.path.join(SCRIPT_DIR, 'config.yaml'), 'w') as config_file:
             yaml.safe_dump(config, config_file, default_style='"')
 
 
 # Load configuration
-with open('config.yaml', 'r') as config_file:
+with open(os.path.join(SCRIPT_DIR, 'config.yaml'), 'r') as config_file:
     config = yaml.safe_load(config_file)
-    database_path = config['kobo']['database_path']
-    database_cache = config['kobo']['database_cache']
+    database_path = os.path.join(SCRIPT_DIR, config['kobo']['database_path'])
+    database_cache = os.path.join(SCRIPT_DIR, config['kobo']['database_cache'])
     integration_token = config['notion']['integration_token']
     parent_page = config['notion']['parent_page']
     icon = config['notion']['icon']
