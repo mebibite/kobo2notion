@@ -1,0 +1,9 @@
+"kobo":
+  "database_cache": "cache/KoboReader.sqlite"
+  "database_path": "/Volumes/KOBOeReader/.kobo/KoboReader.sqlite"
+"kobo2notion":
+  "delta_date": ""
+"notion":
+  "icon": "\U0001F4D6"
+  "integration_token": ""
+  "parent_page": ""
